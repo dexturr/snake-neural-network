@@ -6,6 +6,9 @@ class Runner {
     this.gamesFinished = 0
     this.onEndGeneration = onEndGeneration
 
+    const size = gameSize / gameUnit;
+    const map = new GameMap(size, size);
+
     for (let i = 0; i < games; i++) {
       this.games.push(new Game({
         size: gameSize,
@@ -14,7 +17,8 @@ class Runner {
         maxTurns,
         lowestScoreAllowed,
         score,
-        onGameOver: () => this.endGeneration()
+        onGameOver: () => this.endGeneration(),
+        map,
       }))
     }
   }
