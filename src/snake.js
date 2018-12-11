@@ -1,3 +1,25 @@
+const DIRECTIONS = {
+  UP: [0,0], // 0
+  DOWN: [0,1], // 1
+  LEFT: [1,0], // 2
+  RIGHT: [1,1], // 3
+}
+
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function distanceBetweenTwoPoints([x_1, y_1], [x_2, y_2]) {
+  return Math.sqrt(Math.pow((x_1 - x_2), 2) + Math.pow((y_1, y_2), 2));
+}
+
 class Snake {
 
   constructor (score) {
@@ -5,158 +27,69 @@ class Snake {
   }
 
   reset () {
-    this.segments = [
-      [1, 1],
-      [2, 1],
-      [3, 1],
-      [4, 1],
-      [5, 1]
-    ]
+    this.position = [1, 1]
     this.direction = 'right'
-    this.isEating = false
+    this.foundPoint = false // TODO remove
   }
 
   move (game) {
-    let canMoveForward = 0
-    let canMoveLeft = 0
-    let canMoveRight = 0
-    let isFoodForward = 0
-    let isFoodLeft = 0
-    let isFoodRight = 0
+    const { map } = game;
+    const { squares } = map;
 
-    let head = this.segments[this.segments.length - 1]
+    const currentSquare = squares[this.position[0]][this.position[1]];
+    const leftSquare = squares[Math.max(this.position[0] - 1, 1)][this.position[1]];
+    const rightSquare = squares[Math.min(this.position[0] + 1, map.width - 1)][this.position[1]];
+    const upSquare = squares[this.position[0]][Math.min(this.position[1] + 1, map.height - 1)];
+    const downSquare = squares[this.position[0]][Math.max(this.position[1] - 1, 1)];
 
-    // assess the environment to get the input for the neural network
+    const canMoveLeft = leftSquare.barrier;
+    const canMoveRight = leftSquare.barrier;
+    const canMoveUp = leftSquare.barrier;
+    const canMoveDown = leftSquare.barrier;
 
-    switch (this.direction) {
-      case 'up':
-        if (head[1] !== 1) canMoveForward = 1
-        if (head[0] !== 1) canMoveLeft = 1
-        if (head[0] !== game.unitsPerRow) canMoveRight = 1
-        if (game.food.position[1] < head[1]) isFoodForward = 1
-        if (game.food.position[0] < head[0]) isFoodLeft = 1
-        if (game.food.position[0] > head[0]) isFoodRight = 1
-        this.segments.forEach(s => {
-          if (head[0] === s[0] && head[1] - 1 === s[1]) canMoveForward = 0
-          if (head[0] - 1 === s[0] && head[1] === s[1]) canMoveLeft = 0
-          if (head[0] + 1 === s[0] && head[1] === s[1]) canMoveRight = 0
-        })
-        break
-      case 'down':
-        if (head[1] !== game.unitsPerRow) canMoveForward = 1
-        if (head[0] !== game.unitsPerRow) canMoveLeft = 1
-        if (head[0] !== 1) canMoveRight = 1
-        if (game.food.position[1] > head[1]) isFoodForward = 1
-        if (game.food.position[0] < head[0]) isFoodRight = 1
-        if (game.food.position[0] > head[0]) isFoodLeft = 1
-        this.segments.forEach(s => {
-          if (head[0] === s[0] && head[1] + 1 === s[1]) canMoveForward = 0
-          if (head[0] + 1 === s[0] && head[1] === s[1]) canMoveLeft = 0
-          if (head[0] - 1 === s[0] && head[1] === s[1]) canMoveRight = 0
-        })
-        break
-      case 'left':
-        if (head[0] !== 1) canMoveForward = 1
-        if (head[1] !== game.unitsPerRow) canMoveLeft = 1
-        if (head[1] !== 1) canMoveRight = 1
-        if (game.food.position[0] < head[0]) isFoodForward = 1
-        if (game.food.position[1] < head[1]) isFoodRight = 1
-        if (game.food.position[1] > head[1]) isFoodLeft = 1
-        this.segments.forEach(s => {
-          if (head[1] === s[1] && head[0] - 1 === s[0]) canMoveForward = 0
-          if (head[1] + 1 === s[1] && head[0] === s[0]) canMoveLeft = 0
-          if (head[1] - 1 === s[1] && head[0] === s[0]) canMoveRight = 0
-        })
-        break
-      case 'right':
-        if (head[0] !== game.unitsPerRow) canMoveForward = 1
-        if (head[1] !== 1) canMoveLeft = 1
-        if (head[1] !== game.unitsPerRow) canMoveRight = 1
-        if (game.food.position[0] > head[0]) isFoodForward = 1
-        if (game.food.position[1] < head[1]) isFoodLeft = 1
-        if (game.food.position[1] > head[1]) isFoodRight = 1
-        this.segments.forEach(s => {
-          if (head[1] === s[1] && head[0] + 1 === s[0]) canMoveForward = 0
-          if (head[1] - 1 === s[1] && head[0] === s[0]) canMoveLeft = 0
-          if (head[1] + 1 === s[1] && head[0] === s[0]) canMoveRight = 0
-        })
-        break
+    const foodIsAbove = this.position[1] <= game.food.position[1];
+    const foodIsBelow = this.position[1] >= game.food.position[1];
+    const foodIsRight = this.position[0] <= game.food.position[0];
+    const foodIsLeft = this.position[0] >= game.food.position[0];
+    
+    const input = [
+      canMoveLeft, 
+      canMoveRight, 
+      canMoveUp, 
+      canMoveDown, 
+      foodIsAbove,
+      foodIsBelow, 
+      foodIsRight, 
+      foodIsLeft
+    ];
+    const output = this.brain.activate(input).map(o => Math.round(o)); // [ DIRECTION BIT 1, DIRECTION BIT 2 ]
+    const resultantDirection = output.slice(0, 2);
+    
+    const moveUp = arraysEqual(resultantDirection, DIRECTIONS.UP);
+    const moveDown = arraysEqual(resultantDirection, DIRECTIONS.DOWN);
+    const moveLeft = arraysEqual(resultantDirection, DIRECTIONS.LEFT);
+    const moveRight = arraysEqual(resultantDirection, DIRECTIONS.RIGHT);
+
+    if (moveUp) {
+      foodIsAbove
+      this.position[1] = Math.max(this.position[1] - 1, 1);      
+    } else if (moveDown) {
+      this.position[1] = Math.min(this.position[1] + 1, map.height - 1);         
+    } else if (moveLeft) {
+      this.position[0] = Math.max(this.position[0] - 1, 1);      
+    } else if (moveRight) {
+      this.position[0] = Math.min(this.position[0] + 1, map.height - 1);              
     }
-
-    // activate the neural network (aka "where the magic happens")
-    
-    const input = [canMoveForward, canMoveLeft, canMoveRight, isFoodForward, isFoodLeft, isFoodRight]
-    const output = this.brain.activate(input).map(o => Math.round(o))
-
-    // set the new direction
-    
-    if (output[0]) { // turn left
-      this.brain.score += isFoodLeft ? this.scoreModifiers.movedTowardsFood : this.scoreModifiers.movedAgainstFood
-
-      switch (this.direction) {
-        case 'up': this.direction = 'left'; break
-        case 'down': this.direction = 'right'; break
-        case 'left': this.direction = 'down'; break
-        case 'right': this.direction = 'up'; break
-      }
-    } else if (output[1]) { // turn right
-      this.brain.score += isFoodRight ? this.scoreModifiers.movedTowardsFood : this.scoreModifiers.movedAgainstFood
-
-      switch (this.direction) {
-        case 'up': this.direction = 'right'; break
-        case 'down': this.direction = 'left'; break
-        case 'left': this.direction = 'up'; break
-        case 'right': this.direction = 'down'; break
-      }
-    } else { // go forward
-      this.brain.score += isFoodForward ? this.scoreModifiers.movedTowardsFood : this.scoreModifiers.movedAgainstFood
-    }
-
-    // move the snake
-    
-    if (this.isEating) {
-      switch (this.direction) {
-        case 'up': this.segments.push([head[0], head[1] - 1]); break
-        case 'down': this.segments.push([head[0], head[1] + 1]); break
-        case 'left': this.segments.push([head[0] - 1, head[1]]); break
-        case 'right': this.segments.push([head[0] + 1, head[1]]); break
-      }
-
-      this.isEating = false
+    if (arraysEqual(this.position, game.food.position)) {
+      this.brain.score = this.brain.score + 100;
+      this.foundPoint = true;
     } else {
-      for (let i = 0; i < this.segments.length - 1; i++) {
-        this.segments[i][0] = this.segments[i + 1][0]
-        this.segments[i][1] = this.segments[i + 1][1]
-      }
-
-      head = this.segments[this.segments.length - 1]
-
-      switch (this.direction) {
-        case 'up':
-          head[0] = this.segments[this.segments.length - 2][0]
-          head[1] = this.segments[this.segments.length - 2][1] - 1
-          break
-        case 'down':
-          head[0] = this.segments[this.segments.length - 2][0]
-          head[1] = this.segments[this.segments.length - 2][1] + 1
-          break
-        case 'left':
-          head[0] = this.segments[this.segments.length - 2][0] - 1
-          head[1] = this.segments[this.segments.length - 2][1]
-          break
-        case 'right':
-          head[0] = this.segments[this.segments.length - 2][0] + 1
-          head[1] = this.segments[this.segments.length - 2][1]
-          break
-      }
+      this.brain.score = (
+        distanceBetweenTwoPoints([0, 0], [game.map.width, game.map.height]) -
+        distanceBetweenTwoPoints(this.position, game.food.position)
+      ) - game.turns;
     }
+    
 
-    head = this.segments[this.segments.length - 1]
-
-    if (game.food.position[0] === head[0] && game.food.position[1] === head[1]) {
-      this.isEating = true
-      this.brain.score += this.scoreModifiers.ateFood
-    }
   }
-
 }

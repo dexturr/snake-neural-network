@@ -7,7 +7,7 @@ const FRAME_RATE = 45
 
 // game bottlenecks
 
-const MAX_TURNS = 5000
+const MAX_TURNS = 100
 const LOWEST_SCORE_ALLOWED = -50
 
 // neural network settings

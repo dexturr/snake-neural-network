@@ -3,11 +3,12 @@ const Config = neataptic.Config
 
 Config.warnings = false
 
-const neat = new Neat(6, 2, null, {
+const neat = new Neat(8, 2, null, {
     popsize: GAMES,
     elitism: ELITISM,
     provenance: 1,
     mutationRate: MUTATION_RATE,
+    provenance: 1,
     mutationAmount: MUTATION_AMOUNT
   }
 )
