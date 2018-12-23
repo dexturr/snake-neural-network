@@ -34,13 +34,13 @@ class Snake {
 
   move (game) {
     const { map } = game;
-    const { squares } = map;
+    const { tiles } = map;
 
-    const currentSquare = squares[this.position[0]][this.position[1]];
-    const leftSquare = squares[Math.max(this.position[0] - 1, 1)][this.position[1]];
-    const rightSquare = squares[Math.min(this.position[0] + 1, map.width - 1)][this.position[1]];
-    const upSquare = squares[this.position[0]][Math.min(this.position[1] + 1, map.height - 1)];
-    const downSquare = squares[this.position[0]][Math.max(this.position[1] - 1, 1)];
+    const currentSquare = tiles[this.position[0]][this.position[1]];
+    const leftSquare = tiles[Math.max(this.position[0] - 1, 1)][this.position[1]];
+    const rightSquare = tiles[Math.min(this.position[0] + 1, map.width - 1)][this.position[1]];
+    const upSquare = tiles[this.position[0]][Math.min(this.position[1] + 1, map.height - 1)];
+    const downSquare = tiles[this.position[0]][Math.max(this.position[1] - 1, 1)];
 
     const canMoveLeft = leftSquare.barrier;
     const canMoveRight = leftSquare.barrier;

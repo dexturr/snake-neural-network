@@ -19,7 +19,7 @@ const TILE_OPTIONS = [
 
 class GameMap {
     constructor(width, height) {
-        this.squares = this.generateWhiteMap(width, height);
+        this.tiles = this.generateWhiteMap(width, height);
         this.width = width;
         this.height = height;
     }
