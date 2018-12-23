@@ -1,6 +1,6 @@
 class Game {
 
-  constructor ({size, unit, frameRate, maxTurns, lowestScoreAllowed, score, onGameOver}) {
+  constructor ({size, unit, frameRate, maxTurns, lowestScoreAllowed, score, onGameOver, map}) {
     this.size = size
     this.unit = unit
     this.unitsPerRow = this.size / this.unit
@@ -12,6 +12,7 @@ class Game {
     this.grid = []
     this.snake = new Snake(score)
     this.turns = 0
+    this.map = map
 
     for (let x = 0; x < this.unitsPerRow; x++) {
       for (let y = 0; y < this.unitsPerRow; y++) {
@@ -49,6 +50,20 @@ class Game {
         })
       }
 
+      p.drawMap = () => {
+        for (let i = 0; i < this.unitsPerRow ; i++) {
+          for (let j = 0; j < this.unitsPerRow; j++) {
+            p.fill(game.map.tiles[i][j].color)
+            p.rect(
+              i * game.unit,
+              j * game.unit,
+              game.unit,
+              game.unit
+            )
+          } 
+        }
+      }
+
       p.draw = () => {
         if (['IDLE', 'GAME_OVER'].indexOf(game.status) !== -1) {
           p.background('#EEE')
@@ -72,8 +87,10 @@ class Game {
           return game.onGameOver()
         }
 
+        p.drawMap()
         p.drawSnake()
         p.drawFood()
+
 
         game.turns++
       }

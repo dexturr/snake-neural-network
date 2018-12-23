@@ -2,7 +2,7 @@
 
 const GAMES = 60
 const GAME_SIZE = 100
-const GAME_UNIT = 5
+const GAME_UNIT = 10
 const FRAME_RATE = 45
 
 // game bottlenecks
