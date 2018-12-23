@@ -26,13 +26,13 @@ class GameMap {
 
     generateWhiteMap(width, height) {
         // Want [x][y] for convention
-        const randomMap = [];
+        const map = [];
         for (let i = 0; i < width; i++) {
-            randomMap[i] = [];        
+            map[i] = [];        
             for (let j = 0; j < height; j++) {
-                randomMap[i][j] = TILE_OPTIONS[0];
+                map[i][j] = TILE_OPTIONS[0];
             }
         }
-        return randomMap;
+        return map;
     }
 }
