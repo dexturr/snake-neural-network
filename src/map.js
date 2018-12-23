@@ -19,18 +19,20 @@ const TILE_OPTIONS = [
 
 class GameMap {
     constructor(width, height) {
-        this.map = this.generateRandomMap(width, height);
+        this.tiles = this.generateWhiteMap(width, height);
+        this.width = width;
+        this.height = height;
     }
 
-    generateRandomMap(width, height) {
+    generateWhiteMap(width, height) {
         // Want [x][y] for convention
-        const randomMap = [];
+        const map = [];
         for (let i = 0; i < width; i++) {
-            randomMap[i] = [];        
+            map[i] = [];        
             for (let j = 0; j < height; j++) {
-                randomMap[i][j] = TILE_OPTIONS[Math.floor(Math.random() * TILE_OPTIONS.length)];
+                map[i][j] = TILE_OPTIONS[0];
             }
         }
-        return randomMap;
+        return map;
     }
 }

@@ -53,7 +53,7 @@ class Game {
       p.drawMap = () => {
         for (let i = 0; i < this.unitsPerRow ; i++) {
           for (let j = 0; j < this.unitsPerRow; j++) {
-            p.fill(game.map.map[i][j].color)
+            p.fill(game.map.tiles[i][j].color)
             p.rect(
               i * game.unit,
               j * game.unit,
